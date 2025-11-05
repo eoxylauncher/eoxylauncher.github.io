@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eoxy Launcher - Современный лаунчер для Minecraft</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="images/avatar.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #45a049;
+            --primary-light: #80e27e;
+            --accent: #8BC34A;
+            --python: #3776AB;
+            --python-dark: #2d5f8a;
+            --dark: #0a0a0a;
+            --dark-light: #151515;
+            --dark-lighter: #202020;
+            --text: #f0f0f0;
+            --text-muted: #aaaaaa;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        header.scrolled {
+            padding: 5px 0;
+            background: rgba(10, 10, 10, 0.98);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            border: 2px solid var(--primary);
+        }
+
+        .logo:hover img {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .logo p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+            padding: 8px 0;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .mobile-menu-btn:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 120px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at 30% 50%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 20%, rgba(139, 195, 74, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 52px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: var(--text-muted);
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--dark-lighter);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            margin-bottom: 30px;
+            color: var(--primary);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 35px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-2px);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn-python {
+            background: linear-gradient(135deg, var(--python), var(--python-dark));
+            box-shadow: 0 6px 20px rgba(55, 118, 171, 0.4);
+        }
+
+        .btn-python:hover {
+            box-shadow: 0 10px 25px rgba(55, 118, 171, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        /* Python Section */
+        .python-section {
+            padding: 100px 0;
+            background: var(--dark-light);
+            position: relative;
+        }
+
+        .python-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(55, 118, 171, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(55, 118, 171, 0.05) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .python-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .python-text {
+            flex: 1;
+        }
+
+        .python-text h2 {
+            font-size: 36px;
+            color: var(--python);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .python-text p {
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        .python-features {
+            margin: 25px 0;
+        }
+
+        .python-feature {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .python-feature i {
+            color: var(--python);
+            font-size: 20px;
+        }
+
+        .python-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .python-logo {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--python), var(--python-dark));
+            margin: 0 auto;
+            transition: transform 0.4s;
+        }
+
+        .python-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .python-logo i {
+            font-size: 80px;
+            color: white;
+        }
+
+        /* Download Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--dark-lighter);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+            animation: modalAppear 0.4s ease;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.8) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .download-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .download-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 20px;
+            background: var(--dark-light);
+            border-radius: 12px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .download-option:hover {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.3);
+            transform: translateX(5px);
+        }
+
+        .download-option.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .download-option.disabled:hover {
+            transform: none;
+            background: var(--dark-light);
+            border-color: transparent;
+        }
+
+        .download-option-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .download-option i {
+            font-size: 32px;
+            color: var(--primary);
+        }
+
+        .download-option-text h3 {
+            color: var(--text);
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .download-option-text p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .download-option .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.available {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--primary);
+        }
+
+        .status.unavailable {
+            background: rgba(255, 100, 100, 0.2);
+            color: #ff6464;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 120px 0;
+            background: var(--dark-light);
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(76, 175, 80, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 90% 80%, rgba(139, 195, 74, 0.05) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 70px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title h2 {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .section-title p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-card {
+            background: var(--dark-lighter);
+            border-radius: 15px;
+            padding: 35px 30px;
+            transition: all 0.4s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: rgba(76, 175, 80, 0.2);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .feature-icon i {
+            font-size: 28px;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .screenshots::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 30%, rgba(76, 175, 80, 0.05) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .screenshot {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s;
+            position: relative;
+            height: 220px;
+            background: linear-gradient(135deg, var(--dark-lighter), var(--dark-light));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .screenshot:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .screenshot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+
+        .screenshot:hover img {
+            transform: scale(1.05);
+        }
+
+        /* About Section */
+        .about {
+            padding: 120px 0;
+            background: var(--dark-light);
+            position: relative;
+        }
+
+        .about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 70%, rgba(76, 175, 80, 0.05) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-text h2 {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .about-text p {
+            margin-bottom: 25px;
+            color: var(--text-muted);
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        .about-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 320px;
+            height: 320px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            transition: transform 0.4s;
+        }
+
+        .avatar:hover {
+            transform: scale(1.03);
+        }
+
+        .studio-info {
+            margin-top: 35px;
+            padding: 25px;
+            background: var(--dark-lighter);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .studio-info h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            padding: 80px 0 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-column h3 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .footer-column p, .footer-column a {
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--dark-lighter);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 100;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 42px;
+            }
+            
+            .about-content, .python-content {
+                flex-direction: column;
+            }
+            
+            .about-image, .python-image {
+                order: -1;
+            }
+            
+            .avatar {
+                width: 280px;
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: row;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+                text-align: center;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background: var(--dark-lighter);
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h2 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .section-title h2 {
+                font-size: 32px;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 30px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 14px 30px;
+                font-size: 16px;
+            }
+
+            .feature-card {
+                padding: 25px 20px;
+            }
+
+            .footer-column {
+                min-width: 100%;
+            }
+            
+            .modal-content {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
+        /* Floating animation */
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .floating {
+            animation: float 5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="images/avatar.png" alt="Eoxy Launcher Logo">
+                    <div class="logo-text">
+                        <h1>Eoxy Launcher</h1>
+                        <p>Современный лаунчер для Minecraft</p>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">Возможности</a>
+                    <a href="#python">Установка Python</a>
+                    <a href="#screenshots">Скриншоты</a>
+                    <a href="#about">О лаунчере</a>
+                    <a href="#" class="download-btn">Скачать</a>
+                </div>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <span class="version-badge floating">v1.0</span>
+                <h2>Eoxy Launcher</h2>
+                <p>Современный лаунчер для Minecraft с удобным интерфейсом и расширенными функциями</p>
+                <a href="#" class="btn download-btn">Скачать сейчас</a>
+                <p style="margin-top: 20px; color: var(--text-muted);">Бесплатно • Безопасно • Для Windows, macOS и Linux</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Возможности лаунчера</h2>
+                <p>Eoxy Launcher предлагает все необходимое для комфортной игры в Minecraft</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in delay-1">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Высокая производительность</h3>
+                    <p>Оптимизированный код и минимальное потребление ресурсов для плавной работы даже на слабых ПК. Быстрая загрузка игры и отзывчивый интерфейс.</p>
+                </div>
+                <div class="feature-card fade-in delay-2">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Современный интерфейс</h3>
+                    <p>Красивый и интуитивно понятный интерфейс в темной теме с анимациями и градиентами. Наслаждайтесь приятным визуальным опытом.</p>
+                </div>
+                <div class="feature-card fade-in delay-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Поддержка модификаций</h3>
+                    <p>Встроенная поддержка OptiFine и Forge для установки модов и улучшения графики. Легко управляйте своими модификациями.</p>
+                </div>
+                <div class="feature-card fade-in delay-1">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Автоматические обновления</h3>
+                    <p>Автоматическая загрузка и установка последних версий Minecraft и библиотек. Всегда будьте в курсе последних обновлений.</p>
+                </div>
+                <div class="feature-card fade-in delay-2">
+                    <div class="feature-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3>Гибкие настройки</h3>
+                    <p>Расширенные настройки Java, выделяемой памяти и графических параметров. Настройте лаунчер под свои потребности.</p>
+                </div>
+                <div class="feature-card fade-in delay-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Безопасность</h3>
+                    <p>Только официальные файлы Minecraft, проверенные на вирусы и вредоносный код. Ваша безопасность - наш приоритет.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Python Section -->
+    <section class="python-section" id="python">
+        <div class="container">
+            <div class="python-content">
+                <div class="python-text fade-in">
+                    <h2>Требуется Python</h2>
+                    <p>Для работы Eoxy Launcher необходимо установить Python 3.8 или выше. Это язык программирования, на котором написан наш лаунчер.</p>
+                    
+                    <div class="python-features">
+                        <div class="python-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Python 3.8+ необходим для запуска лаунчера</span>
+                        </div>
+                        <div class="python-feature">
+                            <i class="fas fa-download"></i>
+                            <span>Скачайте с официального сайта для максимальной безопасности</span>
+                        </div>
+                        <div class="python-feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Гарантированная совместимость с последними версиями лаунчера</span>
+                        </div>
+                    </div>
+                    
+                    <p>После установки Python вы сможете запустить Eoxy Launcher и наслаждаться игрой в Minecraft с нашим современным лаунчером.</p>
+                    
+                    <a href="https://www.python.org/downloads/" target="_blank" class="btn btn-python">
+                        <i class="fab fa-python"></i> Скачать Python с официального сайта
+                    </a>
+                </div>
+                <div class="python-image fade-in delay-1">
+                    <div class="python-logo">
+                        <i class="fab fa-python"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="screenshots" id="screenshots">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Скриншоты</h2>
+                <p>Посмотрите на интерфейс Eoxy Launcher</p>
+            </div>
+            <div class="screenshots-grid">
+                <div class="screenshot fade-in delay-1">
+                    <img src="images/screenshot1.jpg" alt="Скриншот интерфейса Eoxy Launcher">
+                </div>
+                <div class="screenshot fade-in delay-2">
+                    <img src="images/screenshot2.jpg" alt="Скриншот настроек Eoxy Launcher">
+                </div>
+                <div class="screenshot fade-in delay-3">
+                    <img src="images/screenshot3.jpg" alt="Скриншот выбора версий в Eoxy Launcher">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text fade-in">
+                    <h2>О Eoxy Launcher</h2>
+                    <p>Eoxy Launcher — это современный и функциональный лаунчер для Minecraft, созданный с учетом потребностей игроков. Мы стремимся предоставить лучший пользовательский опыт с интуитивно понятным интерфейсом и широкими возможностями настройки.</p>
+                    <p>Наш лаунчер поддерживает все официальные версии Minecraft, а также популярные модификации такие как OptiFine и Forge. С Eoxy Launcher установка и запуск Minecraft становятся простыми и удобными.</p>
+                    
+                    <div class="studio-info fade-in delay-1">
+                        <h3>Lolgame52 Studio</h3>
+                        <p>Eoxy Launcher разработан студией Lolgame52, которая специализируется на создании качественного программного обеспечения для игрового сообщества. Наша цель - предоставить игрокам лучшие инструменты для комфортной игры.</p>
+                    </div>
+                </div>
+                <div class="about-image fade-in delay-2">
+                    <img src="images/avatar.png" alt="Eoxy Launcher" class="avatar">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="features" id="download">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Скачать Eoxy Launcher</h2>
+                <p>Выберите версию для вашей операционной системы</p>
+            </div>
+            <div style="text-align: center;" class="fade-in delay-1">
+                <a href="#" class="btn download-btn">Скачать сейчас</a>
+                <p style="margin-top: 20px; color: var(--text-muted);">Бесплатно • Безопасно • Для Windows, macOS и Linux</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Eoxy Launcher</h3>
+                    <p>Современный лаунчер для Minecraft с расширенными функциями и красивым интерфейсом. Создан для настоящих геймеров.</p>
+                    <div class="social-links">
+                        <a href="https://t.me/eoxylauncher" target="_blank"><i class="fab fa-telegram"></i></a>
+                        <a href="https://youtube.com" target="_blank"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Ссылки</h3>
+                    <a href="#features">Возможности</a>
+                    <a href="#python">Установка Python</a>
+                    <a href="#screenshots">Скриншоты</a>
+                    <a href="#about">О лаунчере</a>
+                    <a href="#" class="download-btn">Скачать</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Поддержка</h3>
+                    <a href="mailto:eoxulauncher@gmail.com">Помощь по лаунчеру</a>
+                    <a href="mailto:eoxulauncher@gmail.com">Техническая поддержка</a>
+                    <a href="mailto:eoxulauncher@gmail.com">Сообщить о проблеме</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Контакты</h3>
+                    <p>Разработчик: Lolgame52 Studio</p>
+                    <p>Email: <a href="mailto:eoxulauncher@gmail.com">eoxulauncher@gmail.com</a></p>
+                    <p>Telegram: <a href="https://t.me/Lolgame52" target="_blank">@Lolgame52</a></p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Eoxy Launcher. Все права защищены. Lolgame52 Studio</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Download Modal -->
+    <div class="modal" id="downloadModal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2>Скачать Eoxy Launcher</h2>
+            <p>Выберите версию для вашей операционной системы:</p>
+            
+            <div class="download-options">
+                <div class="download-option" data-url="https://drive.google.com/uc?export=download&id=1Y20IYm_gYh3fRKJWM2DhuWFydXkcJA3E">
+                    <div class="download-option-content">
+                        <i class="fab fa-windows"></i>
+                        <div class="download-option-text">
+                            <h3>Windows</h3>
+                            <p>Windows 10/11 (64-bit) • EXE Installer</p>
+                        </div>
+                    </div>
+                    <div class="status available">Доступно</div>
+                </div>
+                <div class="download-option disabled">
+                    <div class="download-option-content">
+                        <i class="fab fa-apple"></i>
+                        <div class="download-option-text">
+                            <h3>macOS</h3>
+                            <p>macOS 10.14+ (64-bit) • DMG Package</p>
+                        </div>
+                    </div>
+                    <div class="status unavailable">Пока не доступно!</div>
+                </div>
+                <div class="download-option disabled">
+                    <div class="download-option-content">
+                        <i class="fab fa-linux"></i>
+                        <div class="download-option-text">
+                            <h3>Linux</h3>
+                            <p>Ubuntu 18.04+, Fedora 30+ • AppImage</p>
+                        </div>
+                    </div>
+                    <div class="status unavailable">Пока не доступно!</div>
+                </div>
+            </div>
+            
+            <div class="coming-soon">
+                <p>Версии для macOS и Linux находятся в разработке и будут доступны в ближайшее время!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ? 
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Download Modal
+        const downloadBtns = document.querySelectorAll('.download-btn');
+        const downloadModal = document.getElementById('downloadModal');
+        const modalClose = document.querySelector('.modal-close');
+        const downloadOptions = document.querySelectorAll('.download-option');
+        
+        downloadBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                downloadModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        modalClose.addEventListener('click', () => {
+            downloadModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === downloadModal) {
+                downloadModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Download option handlers
+        downloadOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) {
+                    return;
+                }
+                
+                const url = this.getAttribute('data-url');
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            });
+        });
+
+        // Back to Top Button
+        const backToTopBtn = document.querySelector('.back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('active');
+            } else {
+                backToTopBtn.classList.remove('active');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Close mobile menu if open
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section-title, .feature-card, .about-text, .about-image, .studio-info, .screenshot, .python-text, .python-image').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Add floating effect to version badge
+        const versionBadge = document.querySelector('.version-badge');
+        if (versionBadge) {
+            versionBadge.classList.add('floating');
+        }
+    </script>
+</body>
+</html>
